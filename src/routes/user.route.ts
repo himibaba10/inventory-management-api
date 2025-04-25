@@ -3,8 +3,8 @@ import { Router } from "express";
 
 const userRoute = Router();
 
-// userRoute.get("/", customerControllers.getUsers);
-// userRoute.get("/:customerId", customerControllers.getUser);
+userRoute.get("/", userControllers.getUsers);
+userRoute.get("/:userId", userControllers.getUser);
 
 userRoute.post("/", userControllers.createUser);
 

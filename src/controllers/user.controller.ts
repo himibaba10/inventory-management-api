@@ -47,7 +47,61 @@ const createUser: RequestHandler = async (req, res) => {
 
     const { password: ps, ...userRemainingInfo } = newUser;
 
-    res.status(201).json(userRemainingInfo);
+    res.status(201).json({ data: userRemainingInfo, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
+const getUsers: RequestHandler = async (req, res) => {
+  try {
+    const users = await db.user.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    if (!users.length) {
+      res.status(404).json({
+        error: "User not found",
+      });
+      return;
+    }
+
+    const usersWithoutPassword = users.map(
+      ({ password, ...userWithoutPassword }) => userWithoutPassword
+    );
+
+    res.status(201).json({ data: usersWithoutPassword, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
+const getUser: RequestHandler = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        data: null,
+        error: "User not found",
+      });
+      return;
+    }
+
+    res.status(201).json({ data: user, error: null });
   } catch (error) {
     res.status(400).json({
       message: (error as any).message,
@@ -58,4 +112,6 @@ const createUser: RequestHandler = async (req, res) => {
 
 export const userControllers = {
   createUser,
+  getUsers,
+  getUser,
 };
