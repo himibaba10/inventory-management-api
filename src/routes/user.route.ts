@@ -8,8 +8,9 @@ userRoute.get("/:userId", userControllers.getUser);
 
 userRoute.post("/", userControllers.createUser);
 
-// userRoute.patch("/:customerId", customerControllers.updateUser);
+userRoute.patch("/:userId", userControllers.updateUser);
+userRoute.patch("/update-password/:userId", userControllers.updateUserPassword);
 
-// userRoute.delete("/:customerId", customerControllers.deleteUser);
+userRoute.delete("/:userId", userControllers.deleteUser);
 
 export default userRoute;

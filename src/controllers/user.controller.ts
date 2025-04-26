@@ -13,6 +13,7 @@ const createUser: RequestHandler = async (req, res) => {
     dob,
     gender,
     image,
+    role,
   } = req.body;
 
   try {
@@ -42,6 +43,7 @@ const createUser: RequestHandler = async (req, res) => {
         dob,
         gender,
         image: image || "https://i.ibb.co.com/Trqnb1c/pngwing-com.png",
+        role,
       },
     });
 
@@ -110,8 +112,103 @@ const getUser: RequestHandler = async (req, res) => {
   }
 };
 
+const updateUser: RequestHandler = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (req.body.password) {
+      delete req.body.password;
+    }
+
+    const updatedUser = await db.user.update({
+      where: { id: userId },
+      data: { ...req.body },
+    });
+
+    if (!updatedUser) {
+      res.status(404).json({
+        error: "User not found",
+      });
+      return;
+    }
+
+    const { password, ...updatedUserWithoutPassword } = updatedUser;
+
+    res.status(200).json({ data: updatedUserWithoutPassword, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
+const updateUserPassword: RequestHandler = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    if (!req.body.password) {
+      res.status(404).json({
+        error: "No password is specified",
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const updatedUser = await db.user.update({
+      where: { id: userId },
+      data: { password: hashedPassword },
+    });
+
+    if (!updatedUser) {
+      res.status(404).json({
+        error: "User not found",
+      });
+      return;
+    }
+
+    const { password, ...updatedUserWithoutPassword } = updatedUser;
+
+    res.status(200).json({ data: updatedUserWithoutPassword, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
+const deleteUser: RequestHandler = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const user = await db.user.delete({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        data: null,
+        error: "User not found",
+      });
+      return;
+    }
+
+    res.status(201).json({ data: user, success: true, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
 export const userControllers = {
   createUser,
   getUsers,
   getUser,
+  updateUser,
+  updateUserPassword,
+  deleteUser,
 };

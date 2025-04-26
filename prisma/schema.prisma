@@ -53,6 +53,7 @@ enum Role {
 model Shop {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   name         String
+  slug         String   @unique
   location     String
   adminId      String   @db.ObjectId
   admin        User     @relation(fields: [adminId], references: [id])
