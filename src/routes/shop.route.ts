@@ -4,6 +4,7 @@ import { Router } from "express";
 const shopRoute = Router();
 
 shopRoute.get("/", shopControllers.getShops);
+shopRoute.get("/:shopId", shopControllers.getShop);
 shopRoute.get("/:shopId/attendants", shopControllers.getShopAttendants);
 
 shopRoute.post("/", shopControllers.createShop);

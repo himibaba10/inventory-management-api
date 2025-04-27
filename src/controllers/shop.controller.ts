@@ -60,6 +60,31 @@ const getShops: RequestHandler = async (req, res) => {
   }
 };
 
+const getShop: RequestHandler = async (req, res) => {
+  try {
+    const { shopId } = req.params;
+    const shop = await db.shop.findUnique({
+      where: {
+        id: shopId,
+      },
+    });
+
+    if (!shop) {
+      res.status(404).json({
+        error: `Shop not found!`,
+      });
+      return;
+    }
+
+    res.status(200).json({ data: shop, error: null });
+  } catch (error) {
+    res.status(400).json({
+      message: (error as any).message,
+      stack: error,
+    });
+  }
+};
+
 const getShopAttendants: RequestHandler = async (req, res) => {
   try {
     const { shopId } = req.params;
@@ -154,6 +179,7 @@ const addShopAttendant: RequestHandler = async (req, res) => {
 
 export const shopControllers = {
   getShops,
+  getShop,
   getShopAttendants,
   createShop,
   addShopAttendant,
