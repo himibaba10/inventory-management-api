@@ -1,22 +1,22 @@
 import { db } from "@/db/db";
 import { RequestHandler } from "express";
 import bcrypt from "bcrypt";
+import { TError } from "@/interfaces/error";
 
 const createUser: RequestHandler = async (req, res) => {
-  const {
-    email,
-    username,
-    password,
-    firstName,
-    lastName,
-    phone,
-    dob,
-    gender,
-    image,
-    role,
-  } = req.body;
-
   try {
+    const {
+      email,
+      username,
+      password,
+      firstName,
+      lastName,
+      phone,
+      dob,
+      gender,
+      image,
+      role,
+    } = req.body;
     const existingUser = await db.user.findFirst({
       where: {
         OR: [{ email }, { username }, { phone }],
@@ -50,9 +50,9 @@ const createUser: RequestHandler = async (req, res) => {
     const { password: ps, ...userRemainingInfo } = newUser;
 
     res.status(201).json({ data: userRemainingInfo, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
@@ -78,9 +78,9 @@ const getUsers: RequestHandler = async (req, res) => {
     );
 
     res.status(200).json({ data: usersWithoutPassword, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
@@ -109,17 +109,17 @@ const getAttendants: RequestHandler = async (req, res) => {
     );
 
     res.status(200).json({ data: usersWithoutPassword, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
 };
 
 const getUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
   try {
+    const { userId } = req.params;
     const user = await db.user.findUnique({
       where: {
         id: userId,
@@ -135,18 +135,17 @@ const getUser: RequestHandler = async (req, res) => {
     }
 
     res.status(200).json({ data: user, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
 };
 
 const updateUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
-
   try {
+    const { userId } = req.params;
     if (req.body.password) {
       delete req.body.password;
     }
@@ -166,18 +165,30 @@ const updateUser: RequestHandler = async (req, res) => {
     const { password, ...updatedUserWithoutPassword } = updatedUser;
 
     res.status(200).json({ data: updatedUserWithoutPassword, error: null });
-  } catch (error) {
+  } catch (error: TError) {
+    let message = (error as any).message;
+
+    if (error?.stack && error?.meta?.target) {
+      if (error?.meta?.target === "User_username_key") {
+        message = "Username already exists";
+      }
+
+      if (error?.meta?.target === "User_email_key") {
+        message = "Email already exists";
+      }
+    }
+
     res.status(400).json({
-      message: (error as any).message,
+      message,
       stack: error,
     });
   }
 };
 
 const updateUserPassword: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
-
   try {
+    const { userId } = req.params;
+
     if (!req.body.password) {
       res.status(404).json({
         error: "No password is specified",
@@ -201,17 +212,17 @@ const updateUserPassword: RequestHandler = async (req, res) => {
     const { password, ...updatedUserWithoutPassword } = updatedUser;
 
     res.status(200).json({ data: updatedUserWithoutPassword, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
 };
 
 const deleteUser: RequestHandler = async (req, res) => {
-  const { userId } = req.params;
   try {
+    const { userId } = req.params;
     const user = await db.user.delete({
       where: {
         id: userId,
@@ -227,9 +238,9 @@ const deleteUser: RequestHandler = async (req, res) => {
     }
 
     res.status(200).json({ data: user, success: true, error: null });
-  } catch (error) {
+  } catch (error: TError) {
     res.status(400).json({
-      message: (error as any).message,
+      message: error.message,
       stack: error,
     });
   }
