@@ -40,6 +40,36 @@ enum CustomerType {
   OTHER
 }
 
+model Supplier {
+  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+  SupplierType       SupplierType
+  name               String
+  contactPerson      String
+  phone              String
+  email              String       @unique
+  location           String
+  country            String
+  website            String
+  taxPin             String?
+  registrationNumber String?      @unique
+  bankAccountNumber  String?
+  bankName           String?
+  paymentTerms       String?
+  logo               String?
+  rating             String?
+  notes              String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+}
+
+enum SupplierType {
+  MANUFACTURER
+  DISTRIBUTOR
+  WHOLESALER
+  RETAILER
+  OTHER
+}
+
 model User {
   id        String    @id @default(auto()) @map("_id") @db.ObjectId
   email     String    @unique
