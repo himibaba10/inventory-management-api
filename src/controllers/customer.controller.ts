@@ -30,15 +30,9 @@ const getCustomer: RequestHandler = async (req, res) => {
 };
 
 const createCustomer: RequestHandler = async (req, res) => {
-  const { name, email, phone } = req.body;
-
   try {
     const newCustomer = await db.customer.create({
-      data: {
-        name,
-        email,
-        phone,
-      },
+      data: req.body,
     });
 
     res.status(201).json(newCustomer);
@@ -48,13 +42,12 @@ const createCustomer: RequestHandler = async (req, res) => {
 };
 
 const updateCustomer: RequestHandler = async (req, res) => {
-  const { name, email, phone } = req.body;
   const { customerId } = req.params;
 
   try {
     const updatedCustomer = await db.customer.update({
       where: { id: customerId },
-      data: { name, email, phone },
+      data: req.body,
     });
 
     res.status(200).json(updatedCustomer);
