@@ -4,12 +4,12 @@ import { Router } from "express";
 const customerRoute = Router();
 
 customerRoute.get("/", customerControllers.getCustomers);
-customerRoute.get("/:customerId", customerControllers.getCustomer);
+customerRoute.get("/:supplierId", customerControllers.getCustomer);
 
 customerRoute.post("/", customerControllers.createCustomer);
 
-customerRoute.patch("/:customerId", customerControllers.updateCustomer);
+customerRoute.patch("/:supplierId", customerControllers.updateCustomer);
 
-customerRoute.delete("/:customerId", customerControllers.deleteCustomer);
+customerRoute.delete("/:supplierId", customerControllers.deleteCustomer);
 
 export default customerRoute;

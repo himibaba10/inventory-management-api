@@ -49,7 +49,7 @@ model Supplier {
   email              String       @unique
   location           String
   country            String
-  website            String
+  website            String?
   taxPin             String?
   registrationNumber String?      @unique
   bankAccountNumber  String?
