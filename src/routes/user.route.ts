@@ -7,6 +7,7 @@ userRoute.get("/", userControllers.getUsers);
 userRoute.get("/:userId", userControllers.getUser);
 
 userRoute.post("/", userControllers.createUser);
+userRoute.post("/auth/login", userControllers.loginUser);
 
 userRoute.patch("/:userId", userControllers.updateUser);
 userRoute.patch("/update-password/:userId", userControllers.updateUserPassword);

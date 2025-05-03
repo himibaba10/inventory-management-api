@@ -2,6 +2,7 @@ import { db } from "@/db/db";
 import { RequestHandler } from "express";
 import bcrypt from "bcrypt";
 import { TError } from "@/interfaces/error";
+import generateToken from "@/utils/generateToken";
 
 const createUser: RequestHandler = async (req, res) => {
   try {
@@ -50,6 +51,42 @@ const createUser: RequestHandler = async (req, res) => {
     const { password: ps, ...userRemainingInfo } = newUser;
 
     res.status(201).json({ data: userRemainingInfo, error: null });
+  } catch (error: TError) {
+    res.status(400).json({
+      message: error.message,
+      stack: error,
+    });
+  }
+};
+
+const loginUser: RequestHandler = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await db.user.findFirst({
+      where: { email },
+    });
+
+    if (!user) {
+      res.status(404).json({
+        error: "Invalid credentials",
+      });
+      return;
+    }
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordMatched) {
+      res.status(404).json({
+        error: "Invalid credentials",
+      });
+      return;
+    }
+
+    const { password: ps, ...userRemainingInfo } = user;
+
+    const token = generateToken(user.id);
+
+    res.status(201).json({ data: { userRemainingInfo, token }, error: null });
   } catch (error: TError) {
     res.status(400).json({
       message: error.message,
@@ -254,4 +291,5 @@ export const userControllers = {
   updateUser,
   updateUserPassword,
   deleteUser,
+  loginUser,
 };
