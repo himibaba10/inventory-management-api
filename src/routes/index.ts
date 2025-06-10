@@ -1,0 +1,18 @@
+import { Application } from "express";
+import customerRoute from "./customer.route";
+import userRoute from "./user.route";
+import attendantRoute from "./attendant.route";
+import shopRoute from "./shop.route";
+import supplierRoute from "./supplier.route";
+import unitRoute from "./unit.route";
+
+const initiateRoutes = (app: Application) => {
+  app.use("/api/v1/customers", customerRoute);
+  app.use("/api/v1/users", userRoute);
+  app.use("/api/v1/attendants", attendantRoute);
+  app.use("/api/v1/shops", shopRoute);
+  app.use("/api/v1/suppliers", supplierRoute);
+  app.use("/api/v1/units", unitRoute);
+};
+
+export default initiateRoutes;

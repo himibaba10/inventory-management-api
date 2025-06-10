@@ -1,25 +1,29 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import cors from "cors";
-import customerRoute from "./routes/customer.route";
-import userRoute from "./routes/user.route";
-import attendantRoute from "./routes/attendant.route";
-import shopRoute from "./routes/shop.route";
-import supplierRoute from "./routes/supplier.route";
+import initiateRoutes from "./routes";
+import { TError } from "./interfaces/error";
+import startServer from "./server";
 require("dotenv").config();
 const app = express();
-const PORT = process.env.PORT || 3000;
 
 // Middlewares
 app.use(cors());
 app.use(express.json());
 
 // Routes
-app.use("/api/v1/customers", customerRoute);
-app.use("/api/v1/users", userRoute);
-app.use("/api/v1/attendants", attendantRoute);
-app.use("/api/v1/shops", shopRoute);
-app.use("/api/v1/suppliers", supplierRoute);
+initiateRoutes(app);
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.use((err: TError, req: Request, res: Response, next: NextFunction) => {
+  let statusCode = err.status || 500;
+  let message = err.message || "Something went wrong";
+
+  if (err?.code === "P2002") {
+    const fields = err.meta?.target || "unknown field";
+    message = `Duplicate entry for field(s): ${fields}`;
+    statusCode = 409;
+  }
+
+  res.status(statusCode).json({ error: message });
 });
+
+startServer(app);
