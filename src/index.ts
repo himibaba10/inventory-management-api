@@ -1,29 +1,31 @@
-import express, { NextFunction, Request, Response } from "express";
-import cors from "cors";
+import express from "express";
 import initiateRoutes from "./routes";
-import { TError } from "./interfaces/error";
 import startServer from "./server";
+import globalErrorHandler from "./middlewares/globalErrorHandler";
+import initiateMiddlewares from "./middlewares";
+import handleSyncAsyncError from "./middlewares/handleSyncAsyncError";
 require("dotenv").config();
+handleSyncAsyncError();
+
 const app = express();
 
 // Middlewares
-app.use(cors());
-app.use(express.json());
+initiateMiddlewares(app);
 
 // Routes
 initiateRoutes(app);
 
-app.use((err: TError, req: Request, res: Response, next: NextFunction) => {
-  let statusCode = err.status || 500;
-  let message = err.message || "Something went wrong";
+app.use(globalErrorHandler);
 
-  if (err?.code === "P2002") {
-    const fields = err.meta?.target || "unknown field";
-    message = `Duplicate entry for field(s): ${fields}`;
-    statusCode = 409;
+const bootstrap = async () => {
+  try {
+    // Connect to database or run other async setups here (optional)
+
+    startServer(app);
+  } catch (err) {
+    console.error("Failed to start server:", err);
+    process.exit(1);
   }
+};
 
-  res.status(statusCode).json({ error: message });
-});
-
-startServer(app);
+bootstrap();
