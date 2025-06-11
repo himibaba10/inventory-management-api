@@ -70,11 +70,12 @@ const deleteBrand: RequestHandler = async (req, res) => {
     await db.brand.delete({
       where: { id: brandId },
     });
-
-    res.status(204).json({
+    console.log("Came to deleted brand start");
+    res.status(200).json({
       success: true,
       message: "The brand is deleted",
     });
+    console.log("Came to deleted brand finish");
   } catch (error) {
     console.log(error);
   }

@@ -71,7 +71,7 @@ const deleteUnit: RequestHandler = async (req, res) => {
       where: { id: unitId },
     });
 
-    res.status(204).json({
+    res.status(200).json({
       success: true,
       message: "The unit is deleted",
     });

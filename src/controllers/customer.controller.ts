@@ -64,7 +64,7 @@ const deleteCustomer: RequestHandler = async (req, res) => {
       where: { id: customerId },
     });
 
-    res.status(204).json(deletedCustomer);
+    res.status(200).json(deletedCustomer);
   } catch (error) {
     console.log(error);
   }

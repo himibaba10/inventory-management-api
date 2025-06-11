@@ -64,7 +64,7 @@ const deleteSupplier: RequestHandler = async (req, res) => {
       where: { id: supplierId },
     });
 
-    res.status(204).json(deletedSupplier);
+    res.status(200).json(deletedSupplier);
   } catch (error) {
     console.log(error);
   }
