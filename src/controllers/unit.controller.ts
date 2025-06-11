@@ -47,7 +47,7 @@ const getUnit: RequestHandler = async (req, res, next) => {
   }
 };
 
-const updateUnit: RequestHandler = async (req, res) => {
+const updateUnit: RequestHandler = async (req, res, next) => {
   const { unitId } = req.params;
 
   try {
@@ -59,6 +59,7 @@ const updateUnit: RequestHandler = async (req, res) => {
     res.status(200).json(updatedUnit);
   } catch (error) {
     console.log(error);
+    next(error);
   }
 };
 
